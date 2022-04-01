@@ -33,11 +33,10 @@ func UpdateCounter() {
 }
 
 func Init() (e error) {
-
+	db.Init()
 	e = redis.Init()
 	if e != nil {
 		return
 	}
-	db.Init()
 	return
 }

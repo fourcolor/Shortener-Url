@@ -45,6 +45,15 @@ func Init() {
 		Port, e = strconv.Atoi(os.Getenv("DB_PORT"))
 	}
 	client := Connect()
+	sql := `CREATE TABLE IF NOT EXISTS url(
+			oriUrl VARCHAR(1000),
+			expireAt datetime,
+			shortenUrl VARCHAR(50) PRIMARY KEY
+		); `
+
+	if _, err := client.Exec(sql); err != nil {
+		panic(err)
+	}
 	client.Close()
 	return
 }
@@ -62,7 +71,7 @@ func Connect() *sql.DB {
 func SetShortenUrl(oriUrl, shortenUrl, expireAt string) {
 	db := Connect()
 	defer db.Close()
-	_, err := db.Exec("insert into url(oriUrl,shortenUrl,expirtedAt) values(?,?,?)", oriUrl, shortenUrl, expireAt)
+	_, err := db.Exec("insert into url(oriUrl,shortenUrl,expireAt) values(?,?,?)", oriUrl, shortenUrl, expireAt)
 	if err != nil {
 		panic(err)
 	}
@@ -71,7 +80,7 @@ func SetShortenUrl(oriUrl, shortenUrl, expireAt string) {
 func GetOriUrl(shortenUrl, expireAt string) (oriUrl string) {
 	db := Connect()
 	defer db.Close()
-	err := db.QueryRow("select oriUrl from dcard.url where oriUrl = ? and expirtedAt > ?", shortenUrl, expireAt).Scan(&oriUrl)
+	err := db.QueryRow("select oriUrl from dcard.url where oriUrl = ? and expireAt > ?", shortenUrl, expireAt).Scan(&oriUrl)
 	if err != nil && err != sql.ErrNoRows {
 		panic(err)
 	}
@@ -81,7 +90,7 @@ func GetOriUrl(shortenUrl, expireAt string) (oriUrl string) {
 func GetShortenUrlbyExp(oriUrl string, expireAt string) (shortenUrl string) {
 	db := Connect()
 	defer db.Close()
-	err := db.QueryRow("select shortenUrl from dcard.url where oriUrl = ? and expirtedAt = ?", oriUrl, expireAt).Scan(&shortenUrl)
+	err := db.QueryRow("select shortenUrl from dcard.url where oriUrl = ? and expireAt = ?", oriUrl, expireAt).Scan(&shortenUrl)
 	if err != nil && err != sql.ErrNoRows {
 		panic(err)
 	}
