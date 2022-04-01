@@ -6,6 +6,15 @@ import (
 	"time"
 )
 
+func TestInit(t *testing.T) {
+	e := model.Init()
+	if e == nil {
+		t.Log("Init success")
+	} else {
+		t.Error("Init fail")
+	}
+}
+
 func TestGetCounter(t *testing.T) {
 	count := model.GetCounter()
 	if count >= 1 {
@@ -50,14 +59,5 @@ func TestGetShort(t *testing.T) {
 		t.Log("Get Short success")
 	} else {
 		t.Error("Get Short fail")
-	}
-}
-
-func TestInit(t *testing.T) {
-	e := model.Init()
-	if e == nil {
-		t.Log("Init success")
-	} else {
-		t.Error("Init fail")
 	}
 }
