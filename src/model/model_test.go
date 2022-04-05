@@ -42,7 +42,7 @@ func TestInsertAndGet(t *testing.T) {
 	testTime := time.Now().Add(time.Hour)
 	dt := time.Duration(testTime.Sub(time.Now()))
 	model.SetShortenUrl("testOri", ("short" + testTime.Format("2006-01-02 15:04:05")), testTime.Format("2006-01-02 15:04:05"), dt)
-	ori := model.GetOriUrl(("short" + testTime.Format("2006-01-02 15:04:05")), testTime.Format("2006-01-02 15:04:05"))
+	ori := model.GetOriUrl(("short" + testTime.Format("2006-01-02 15:04:05")))
 	if ori == "testOri" {
 		t.Log("Insert and get success")
 	} else {
@@ -54,8 +54,8 @@ func TestGetShort(t *testing.T) {
 	testTime := time.Now().Add(time.Hour)
 	dt := time.Duration(testTime.Sub(time.Now()))
 	model.SetShortenUrl("testOri", "short1"+testTime.Format("2006-01-02 15:04:05"), testTime.Format("2006-01-02 15:04:05"), dt)
-	short := model.GetShortenUrlbyExp("testOri", testTime.Format("2006-01-02 15:04:05"))
-	if short == "short1"+testTime.Format("2006-01-02 15:04:05") {
+	short := model.GetShortbyOri("["+testTime.Format("2006-01-02 15:04:05"), "["+testTime.Format("2006-01-02 15:04:05"))[0]
+	if short == testTime.Format("2006-01-02 15:04:05") {
 		t.Log("Get Short success")
 	} else {
 		t.Error("Get Short fail")

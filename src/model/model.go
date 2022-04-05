@@ -1,27 +1,21 @@
 package model
 
 import (
-	db "dcardHw/src/model/db"
 	redis "dcardHw/src/model/redis"
 	"time"
 )
 
-func GetOriUrl(shortenUrl, exp string) (url string) {
-	url = redis.GetOriUrl(shortenUrl)
-	if url == "" {
-		url = db.GetOriUrl(shortenUrl, exp)
-	}
+func SetShortenUrl(ori, shorten, zv string, t time.Duration) {
+	redis.SetShortenUrl(ori, shorten, zv, t)
+}
+
+func GetShortbyOri(min, max string) (url []string) {
+	url = redis.GetShortbyOri(min, max)
 	return
 }
 
-func SetShortenUrl(ori, shorten, exp string, t time.Duration) {
-	redis.SetShortenUrl(ori, shorten, t)
-	db.SetShortenUrl(ori, shorten, exp)
-}
-
-func GetShortenUrlbyExp(ori, exp string) (url string) {
-	url = db.GetShortenUrlbyExp(ori, exp)
-	return
+func GetOriUrl(short string) string {
+	return redis.GetOriUrl(short)
 }
 
 func GetCounter() (val int64) {
@@ -33,10 +27,6 @@ func UpdateCounter() {
 }
 
 func Init() (e error) {
-	db.Init()
 	e = redis.Init()
-	if e != nil {
-		return
-	}
 	return
 }

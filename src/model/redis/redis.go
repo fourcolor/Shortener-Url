@@ -19,27 +19,26 @@ func Connect() *redis.Client {
 func Init() error {
 	client := Connect()
 	defer client.Close()
-	tv, _ := client.Get("total").Result()
+	tv, err := client.Get("total").Result()
+	if err == redis.Nil {
+		err = client.Set("total", 1, 0).Err()
+		if err != nil {
+			return err
+		}
+	}
 	var val int64
-	_, err := fmt.Sscan(tv, &val)
-	if err != nil {
-		return err
-	}
-	e := client.Set("total", 1, 0).Err()
-	if e != nil {
-		return err
-	}
-	return nil
+	_, err = fmt.Sscan(tv, &val)
+	return err
 }
 
-func OriExited(ori string) bool {
+func GetShortbyOri(min, max string) []string {
 	client := Connect()
 	defer client.Close()
-	_, err := client.SIsMember("ori", ori).Result()
-	if err != nil {
-		panic(err)
-	}
-	return err != redis.Nil
+	r := redis.ZRangeBy{Min: min, Max: max, Offset: 0, Count: 1}
+	data := client.ZRangeByLex("url", r)
+	fmt.Println(data)
+	res, _ := data.Result()
+	return res
 }
 
 func GetOriUrl(shortenUrl string) string {
@@ -55,13 +54,15 @@ func GetOriUrl(shortenUrl string) string {
 	return val
 }
 
-func SetShortenUrl(ori, shorten string, t time.Duration) {
+func SetShortenUrl(ori, shorten, zv string, t time.Duration) {
 	client := Connect()
 	defer client.Close()
 	err := client.Set(shorten, ori, t).Err()
 	if err != nil {
 		panic(err)
 	}
+	z := redis.Z{Score: 0, Member: zv}
+	client.ZAdd("url", z)
 }
 
 func GetCounter() (val int64) {
