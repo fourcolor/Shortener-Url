@@ -26,8 +26,10 @@ func Shortener(server *gin.Engine) *gin.Engine {
 		status, shortenUrl := services.GenerateShortenUrl(shortenerReq.Url, shortenerReq.ExpireAt)
 		if status == 0 {
 			ctx.JSON(http.StatusAccepted, gin.H{"id": shortenerReq.Url, "shortUrl": shortenUrl})
-		} else {
+		} else if status == 1 {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid url"})
+		} else if status == 2 {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid expireAt"})
 		}
 
 	})
